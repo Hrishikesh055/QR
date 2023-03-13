@@ -1,0 +1,30 @@
+from flask import Flask, send_file,request
+import io
+import pyqrcode
+
+app = Flask(__name__)
+
+@app.route('/',methods=['POST'])
+def index():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        json = request.json
+        print(json)
+        # String which represents the QR code
+        s=json['url']
+        print(s)
+
+    # Generate QR code
+        url = pyqrcode.create(s)
+
+    # Save the png file to memory
+        img = io.BytesIO()
+        url.png(img, scale=6)
+
+    # Return the png file
+        img.seek(0)
+        return send_file(img, mimetype='image/png')
+    else:
+        return 'Content-Type not supported!'
+if __name__ == "__main__":
+    app.run(debug=True)
