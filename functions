@@ -1,0 +1,212 @@
+def my_QR():
+    import pyqrcode
+    import png
+    from pyqrcode import QRCode
+
+
+# String which represents the QR code
+    s = input("")
+
+# Generate QR code
+    url = pyqrcode.create(s)
+
+# Create and save the svg file naming "myqr.svg"
+    url.svg("myqr.svg", scale = 8)
+
+# Create and save the png file naming "myqr.png"
+    url.png('myqr.png', scale = 6)
+print("QR code generated")
+my_QR()
+
+
+
+
+
+
+def my_logo():    
+    import qrcode
+    from PIL import Image
+        
+# taking image which user wants
+# in the QR code center
+    Logo_link = 'C:/Users/hrish/Desktop/DataVisual/logo.png'
+ 
+    logo = Image.open(Logo_link)
+     
+# taking base width
+    basewidth = 100
+     
+# adjust image size
+    wpercent = (basewidth/float(logo.size[0]))
+    hsize = int((float(logo.size[1])*float(wpercent)))
+    logo = logo.resize((basewidth, hsize), Image.ANTIALIAS)
+    QRcode = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_H
+)
+     
+# taking url or text
+    url = input("")
+     
+# adding URL or text to QRcode
+    QRcode.add_data(url)
+     
+# generating QR code
+    QRcode.make()
+     
+# taking color name from user
+    QRcolor = 'purple'
+     
+# adding color to QR code
+    QRimg = QRcode.make_image(
+    fill_color=QRcolor, back_color="orange").convert('RGB')   
+     
+# set size of QR code
+    pos = ((QRimg.size[0] - logo.size[0]) // 2,
+       (QRimg.size[1] - logo.size[1]) // 2)
+    QRimg.paste(logo, pos)
+     
+# save the QR code generated
+    QRimg.save(r'C:\Users\hrish\Desktop\Mywork\qrlogo.png')
+print('QR code generated!')
+my_logo()
+
+
+
+
+
+
+
+def my_qrframe():
+    import qrcode
+    from PIL import Image,ImageOps
+    import qrcode
+    from PIL import Image, ImageDraw
+    from qrcode.image.styledpil import StyledPilImage
+    from qrcode.image.styles.moduledrawers import (
+     CircleModuleDrawer, SquareModuleDrawer
+)
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+    def show_qr(img):
+        plt.figure(figsize=(4,4))
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()
+# taking image which user wants 
+# in the QR code center
+    Logo_link = r'C:\Users\hrish\Desktop\Mywork\QRcode\Logo.png'
+    logo = Image.open(Logo_link)
+# taking base width
+    basewidth = 110
+# adjust image size
+    wpercent = (basewidth/float(logo.size[0]))
+    hsize = int((float(logo.size[1])*float(wpercent)))
+    logo = logo.resize((basewidth, hsize), Image.ANTIALIAS)
+    QRcode = qrcode.QRCode(
+     error_correction=qrcode.constants.ERROR_CORRECT_H,
+     box_size=10,
+     border=10
+)
+# taking url or text
+    url = input("")
+# adding URL or text to QRcode
+    QRcode.add_data(url)
+    QRcode.make(fit=True)
+# generating QR code
+    QRcode.make()
+# taking color name from user
+    QRcolor = 'blue'
+# adding color to QR code
+    QRimg = QRcode.make_image(
+     fill_color=QRcolor, back_color="orange").convert('RGB')
+# set size of QR code
+    pos = ((QRimg.size[0] - logo.size[0]) // 2,
+     (QRimg.size[1] - logo.size[1]) // 2)
+    QRimg.paste(logo, pos)
+    QRimg_copy = QRimg.copy()
+    draw = ImageDraw.Draw(QRimg_copy)
+    draw.ellipse(
+     (1,1, QRimg_copy.size[1]-1, QRimg_copy.size[1]-1),
+     fill = None,
+     outline ='black',
+     width=10
+)
+    img = Image.open(r'C:\Users\hrish\Desktop\Mywork\QR.png')
+    img_with_border = ImageOps.expand(img,border=20,fill='red')
+    img_with_border.show('imaged-with-border.png')
+    show_qr(QRimg_copy)
+    show_qr(img_with_border)
+# save the QR code generated
+    QRimg_copy.save(r'C:\Users\hrish\Desktop\Mywork\QR.png')
+    img_with_border.save(r'C:\Users\hrish\Desktop\Mywork\border.png')
+    print('QR code generated!')
+my_qrframe()    
+
+
+
+
+
+
+def my_QRgradient():
+    import qrcode
+    from PIL import Image
+    from PIL import Image, ImageDraw
+    from qrcode.image.styledpil import StyledPilImage
+    from qrcode.image.styles.moduledrawers import (
+     CircleModuleDrawer, SquareModuleDrawer,GappedSquareModuleDrawer,
+     RoundedModuleDrawer,VerticalBarsDrawer,HorizontalBarsDrawer
+)
+    from qrcode.image.styles.colormasks import (
+     SolidFillColorMask,RadialGradiantColorMask,SquareGradiantColorMask,
+     HorizontalGradiantColorMask,VerticalGradiantColorMask,ImageColorMask
+)
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+    def show_qr(img):
+        plt.figure(figsize=(5,5))
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()
+#taking image which user wants in the QR code center
+    Logo_link=r"C:\Users\hrish\Desktop\Mywork\QRcode\logo.png"
+    logo=Image.open(Logo_link)
+# taking base width
+    basewidth=100
+# adjust image size
+    wpercent=(basewidth/float(logo.size[0]))
+    hsize = int((float(logo.size[1])*float(wpercent)))
+    logo = logo.resize((basewidth, hsize), Image.ANTIALIAS)
+    QRcode = qrcode.QRCode(
+    error_correction=qrcode.constants.ERROR_CORRECT_H,
+    box_size=10,
+    border=10
+)
+# taking url or text
+    url = 'https://www.geeksforgeeks.org/'
+# adding URL or text to QRcode
+    QRcode.add_data(url)
+    QRcode.make(fit=True)
+# generating QR code
+#QRcode.make()
+#taking color name from user
+    QRcolor = 'green'
+# adding color to QR code , changing data shape of qr code
+    QRimg = QRcode.make_image(
+    fill_color=QRcolor, back_color="orange",image_factory=StyledPilImage, color_mask=RadialGradiantColorMask()).convert('RGB')
+# placing logo on the QR code
+    '''pos = ((QRimg.size[0] - logo.size[0]) // 2,
+     (QRimg.size[1] - logo.size[1]) // 2)
+    QRimg.paste(logo, pos)'''
+    QRimg_copy = QRimg.copy()
+#adding boarder
+    '''draw = ImageDraw.Draw(QRimg_copy)
+    draw.ellipse(
+     (1, 1, QRimg_copy.size[1]-1, QRimg_copy.size[1]-1),
+     fill = None,
+     outline ='black',
+     width=30
+)'''
+    QRimg.save(r'C:\Users\hrish\Desktop\Mywork\qrgradient.png')
+    show_qr(QRimg_copy)
+    print('QR code generated!')
+my_QRgradient()
