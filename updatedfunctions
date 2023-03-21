@@ -3,11 +3,24 @@ import io
 import pyqrcode
 import png
 from pyqrcode import QRCode
-from PIL import Image
+from PIL import Image,ImageOps
 import requests
 import qrcode
+from flask_expects_json import expects_json
 # ...
 app = Flask(__name__)
+validation = {
+    "type": "object",
+    "properties": {
+        "url":{"type":"string"},
+        "logo_url":{ "type": "string" },
+        "front_color":{"type":"string","pattern": "(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\b|(?:rgb|hsl)a?\([^\)]*\)"},
+        "back_color":{"type":"string","pattern": "(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\b|(?:rgb|hsl)a?\([^\)]*\)"},
+        "border_thickness":{"type":"number"},
+        "border_color":{"type":"string","pattern": "(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\b|(?:rgb|hsl)a?\([^\)]*\)"}
+    },
+    "required": ["url"]
+}
 def QR(url):
     qr = qrcode.QRCode(
         version=1,
@@ -38,34 +51,54 @@ def QR_logo(qr_img,logo_url):
     pos = ((qr_img.size[0] - logo.size[0]) // 2, (qr_img.size[1] - logo.size[1]) // 2)
     qr_img.paste(logo, pos)
     return qr_img
+def QR_frame(img,border_thickness,border_color):
+    img_with_border = ImageOps.expand(img,border=border_thickness,fill=border_color)
+    return img_with_border
 
-@app.route('/', methods=['POST'])
+@app.route('/qrcode', methods=['POST'])
+@expects_json(validation, ignore_for=['GET'])
 def process_json():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        json = request.json
-        url=json['url']
-        front_color=back_color=logo_url=None
-        if 'front_color' not in json:
-            front_color="black"
+    try:
+        content_type = request.headers.get('Content-Type')
+        if (content_type == 'application/json'):
+            json = request.json
+            url=json['url']
+            front_color=back_color=logo_url=border_thickness=border_color=logo_url=None
+            if 'front_color' not in json:
+                front_color="rgb(0,0,0)"
+            else:
+                front_color=json['front_color']
+            
+            if 'back_color' not in json:
+                back_color="rgb(255,255,255)"
+            else:
+                back_color=json['back_color']
+            if 'border_thickness' not in json:
+                border_thickness= 2
+            else:
+                border_thickness=json['border_thickness']
+            if 'border_color' not in json:
+                border_color="rgb(0,0,0)"
+            else:    
+                border_color=json['border_color']
+            if 'logo_url' not in json:
+                logo_url=None
+            else:         
+                logo_url=json['logo_url']
+            qr= QR(url)
+            qr_img= QR_color(qr,front_color,back_color)
+            img_with_border=QR_frame(qr_img,border_thickness,border_color)
+            image=img_with_border
+            if logo_url:
+                image=QR_logo(img_with_border,logo_url)
+            
+            img = io.BytesIO()
+            image.save(img, 'PNG')
+            img.seek(0)
+            return send_file(img, mimetype='image/png')
         else:
-            front_color=json['front_color']
-        print(front_color)
-        if 'back_color' not in json:
-            back_color="white"
-        else:
-            back_color=json['back_color']
-        logo_url=json['logo_url']
-        qr= QR(url)
-        qr_img= QR_color(qr,front_color,back_color)
-        image=QR_logo(qr_img,logo_url)
-
-
-        img = io.BytesIO()
-        image.save(img, 'PNG')
-        img.seek(0)
-        return send_file(img, mimetype='image/png')
-    else:
-        return 'Content-Type not supported!'
+            return 'Content-Type not supported!'
+    except: 
+        return {"message":"something went wrong"}    
 if __name__ == "__main__":
     app.run(debug=True)
