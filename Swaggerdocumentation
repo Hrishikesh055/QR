@@ -1,0 +1,157 @@
+info:
+  title: QR code generator
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/qrcode
+paths:
+  /qrcode:
+    post:
+      security:
+        - ApiKeyAuth: []
+      url: generates the QR code for the given url.
+      requestBody:
+        description: contains the url of the website that needs to be embedded in the QR code.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  default: https://www.exponentialhost.com/
+      logo_url: 
+      requestBody:
+        description: contains the image address of the image/logo that needs to be placed inside the QR code.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  default: https://www.adobe.com/express/create/media_127a4cd0c28c2753638768caf8967503d38d01e4c.jpeg?width=400&format=jpeg&optimize=medium
+      front_color:
+      requestBody:
+        description: color of the frontside of the QR code as desired by the user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  default: black
+      back_color:
+      requestBody:
+        description: color of the backside of the QR code as desired by the user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  default: white
+      border_thickness:
+      requestBody:
+        description: defines the width of the QR code frame. 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: number
+                  default: '0'
+      border_color:
+      requestBody:
+        description: color of the frame of the QR code
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  default: black
+      description: QR generator API generates customizable QR codes.
+      
+      responses:
+        '200':
+          description: Returns the QR code.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    default: This API provides a way to create and customize QR codes according to the user's need.
+                  length:
+                    type: number
+        '400':
+          description: Returns Error message in case something went wrong
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    default: Something went wrong
+        '401':
+          description: The request was unacceptable. Typically due to the API key missing or incorrect input.
+          content:
+            application/json:
+              schema:
+                type: string
+                properties: 
+                  message:
+                    type:
+                    default: unauthorized
+        '500': 
+          description: The request could not be completed due to an error on the server side.
+          content:
+            application/json:
+              schema:
+                type: string
+                properties: 
+                  message:
+                    type:
+                    default: Internal Server Error
+        '503': 
+          description: The server was unavailable.
+          content:
+            application/json:
+              schema:
+                type: string
+                properties: 
+                  message:
+                    type:
+                    default: Service Unavailable            
+          
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: API-key
+tags: []
