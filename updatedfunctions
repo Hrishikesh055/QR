@@ -1,11 +1,15 @@
 from flask import Flask, request,send_file
 import io
+import datetime
+import os
 import pyqrcode
 import png
 from pyqrcode import QRCode
 from PIL import Image,ImageOps
 import requests
 import qrcode
+import boto3
+from botocore.exceptions import NoCredentialsError
 from flask_expects_json import expects_json
 # ...
 app = Flask(__name__)
@@ -21,6 +25,25 @@ validation = {
     },
     "required": ["url"]
 }
+def upload_to_aws(image, s3_file):
+    s3 = boto3.client('s3', aws_access_key_id=os.getenv('AWS_ACCESS_ID'),
+                      aws_secret_access_key=os.getenv('AWS_ACCESS_KEY'))
+
+    try:
+        img = io.BytesIO()
+        image.save(img, 'PNG')
+        img.seek(0)
+        s3.upload_fileobj(img,os.getenv("AWS_BUCKET_NAME"), s3_file)
+        print("Upload Successful")
+        link = 'https://testi.exponentialhost.com/' + s3_file
+        return link
+        # return 'https:i.exponentialhost.com/textInImage/image.png'
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
 def QR(url):
     qr = qrcode.QRCode(
         version=1,
@@ -28,8 +51,6 @@ def QR(url):
         box_size=10,
         border=4,
         )
-        # url = pyqrcode.create(s)
-        # print(s)
     qr.add_data(url)
     qr.make(fit=True)
     return qr
@@ -91,14 +112,18 @@ def process_json():
             image=img_with_border
             if logo_url:
                 image=QR_logo(img_with_border,logo_url)
-            
-            img = io.BytesIO()
-            image.save(img, 'PNG')
-            img.seek(0)
-            return send_file(img, mimetype='image/png')
+              
+            presentDate = datetime.datetime.now()
+            unix_timestamp = datetime.datetime.timestamp(presentDate)*1000  
+            link=upload_to_aws(image,'qrcode/' + str(int(unix_timestamp)) + '.png')
+            return{
+                'url':link
+                }
+            #return send_file(img, mimetype='image/png')
         else:
             return 'Content-Type not supported!'
-    except: 
+    except Exception as e:
+        print
         return {"message":"something went wrong"}    
 if __name__ == "__main__":
     app.run(debug=True)
